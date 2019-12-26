@@ -4,28 +4,29 @@ if include("opencv"):
     import cv2
 if include("skimage"):
     from skimage import transform
-# if include("scipy"):
-#     from scipy import ndimage
-# if include("numpy"):
-#     import numpy as np
+if include("scipy"):
+    from scipy import ndimage
+if include("numpy"):
+    import numpy as np
 if include("pillow"):
     from PIL import Image
 
 
-def resize(im, output_shape, antialias=False):
+def resize(im, output_shape, antialias=True):
     def run_skimage():
-        return transform.resize(im, output_shape)
+        # 默认
+        im_float64 = transform.resize(im, output_shape, order=0, anti_aliasing=antialias)
+        return (im_float64 * 255).astype("uint8")
 
     def run_opencv():
         return cv2.resize(im, dsize=output_shape)
 
     def run_pillow():
-        if antialias:
-            # 开启抗锯齿，耗时增加8倍左右
-            resample = Image.ANTIALIAS
-        else:
-            resample = Image.NEAREST
-        im.resize(output_shape, resample)
+        # 开启抗锯齿，耗时增加8倍左右
+        resample = Image.ANTIALIAS if antialias else Image.NEAREST
+        # 注意：pillow.size 与 ndarray.size 顺序不同
+        h, w = output_shape
+        return im.resize((w, h), resample)
 
     return run_backend(
             func_skimage=run_skimage,
@@ -60,6 +61,10 @@ def rotate(im, angle):
         cols, rows = im.shape[:2]
         M = cv2.getRotationMatrix2D((cols/2, rows/2), angle, 1)
         return cv2.warpAffine(im, M, (cols, rows))
+
+    def run_pillow():
+        # expand：如果设为True，会放大图像的尺寸，以适应旋转后的新图像
+        return im.rotate(angle, expand=False)
 
     return run_backend(
             func_skimage=run_skimage,

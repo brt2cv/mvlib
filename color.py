@@ -3,13 +3,13 @@ from .backend import run_backend, include
 if include("opencv"):
     import cv2
 # if include("skimage"):
-#     from skimage import ...
-# if include("scipy"):
-#     from scipy import ndimage
+#     from skimage import *
+if include("scipy"):
+    from scipy import ndimage
 if include("numpy"):
     import numpy as np
-# if include("pillow"):
-#     from PIL import Image
+if include("pillow"):
+    from PIL import Image
 
 
 def rgb2gray(im):

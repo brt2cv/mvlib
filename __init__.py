@@ -6,3 +6,5 @@ from .backend import set_backend
 from .io import *
 from .transform import *
 from .color import *
+from .filters import *
+from .morphology import *
