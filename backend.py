@@ -38,7 +38,8 @@ dict_backend = {
 
 def set_backend(name=None):
     """ name = None 仅用于初始化 """
-    if name is not None:
+    notInitial = name is not None
+    if notInitial:
         assert name in dict_backend, f"未知的后端类型：【{name}】"
         dict_conf["backend"] = name
 
@@ -48,10 +49,10 @@ def set_backend(name=None):
     g.register("Backend", dict_conf["backend"], forced=True)
     print(f"Using 【{dict_conf['backend']}】 Backend")
 
-    # 重新reload()各个子模块
-    from . import reload_mvlib
+    # 由于include()，需要reload()各个子模块
+    from . import _import_submodules
     try:
-        reload_mvlib()
+        _import_submodules(notInitial)
     except ModuleNotFoundError:
         print(f"当前后端使用【{get_backend()}】，但未找到依赖库；请更换后端")
 
