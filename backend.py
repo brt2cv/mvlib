@@ -27,11 +27,19 @@ else:
 def get_backend():
     return dict_conf["backend"]
 
+
+dict_backend = {
+    "pillow":   ["PIL"],
+    "numpy":    ["numpy"],
+    "scipy":    ["scipy"],
+    "skimage":  ["skimage"],
+    "opencv":   ["cv2"]
+}
+
 def set_backend(name=None):
     """ name = None 仅用于初始化 """
     if name is not None:
-        choice = ["pillow", "numpy", "scipy", "skimage", "opencv"]
-        assert name in choice, f"未知的后端类型：【{name}】"
+        assert name in dict_backend, f"未知的后端类型：【{name}】"
         dict_conf["backend"] = name
 
         with open(path_conf, "w") as fp:
@@ -41,6 +49,11 @@ def set_backend(name=None):
     print(f"Using 【{dict_conf['backend']}】 Backend")
 
     # 重新reload()各个子模块
+    from . import reload_mvlib
+    try:
+        reload_mvlib()
+    except ModuleNotFoundError:
+        print(f"当前后端使用【{get_backend()}】，但未找到依赖库；请更换后端")
 
 #####################################################################
 # 类型提升
@@ -101,5 +114,3 @@ def run_backend(
 
     Backend = get_backend()
     return try_run(Backend)
-
-set_backend(None)
