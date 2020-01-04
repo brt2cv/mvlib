@@ -251,6 +251,7 @@ def get_box_sides(box):
         height, width = width, height
     return (width, height)
 
+
 class ContoursCollection:
     def __init__(self, list_cnts):
         self.cnts = list_cnts

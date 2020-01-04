@@ -1,5 +1,4 @@
 import numpy as np
-from utils.imgio import guess_mode
 from imageio.core.util import Array, asarray
 
 from .contours import find_cnts, cnts2img
@@ -11,6 +10,37 @@ def make_rgb(rgb: tuple, w, h):
     im_arr = np.zeros([h, w, 3], dtype=np.uint8)
     im_arr[..., ] = rgb
     return im_arr
+
+def shape2size(shape):
+    """ im_arr.shape: {h, w, c}
+        PIL.Image.size: {w, h}
+    """
+    size = (shape[1], shape[0])
+    return size
+
+def shape2mode(shape):
+    if len(shape) < 3:
+        return "L"
+    elif shape[2] == 3:
+        return "RGB"  # 无法区分BGR (OpenCV)
+    elif shape[2] == 4:
+        return "RGBA"
+    else:
+        raise Exception("未知的图像类型")
+
+def get_mode(im_arr):
+    """ 一种预测图像mode的简单方式 """
+    if im_arr.ndim < 3:
+        return "L"
+
+    shape = im_arr.shape
+    if shape[2] == 3:
+        return "RGB"  # 无法区分BGR (OpenCV)
+    elif shape[2] == 4:
+        return "RGBA"
+    else:
+        raise Exception("未知的图像类型")
+
 
 class ImagePlus(Array):
     """ ArrayPlus(array, meta=None)
@@ -57,7 +87,7 @@ class ImagePlus(Array):
 
     @property
     def mode(self):
-        return guess_mode(self)
+        return get_mode(self)
 
     # def get_msk(self, mode='in'):
     #     if self.roi==None:return None
