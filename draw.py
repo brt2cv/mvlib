@@ -21,7 +21,7 @@ if include("pillow"):
 
 
 from utils.log import getLogger
-logger = getLogger(1)
+logger = getLogger()
 
 
 def pil_drawing(im_arr, func_name, data, color, **kwargs):
@@ -61,19 +61,13 @@ def pil_drawing(im_arr, func_name, data, color, **kwargs):
     return im_output
 
 def point(im_arr, list_pnts, color, width=1):
-    im2 = im_arr.copy()
-
-    def run_pillow():
-        draw = ImageDraw.Draw(im2)
-
-
-    return im2
+    """ draw a point """
 
 def line(im_arr, list_pnts, color, width=1):
-    if Backend == "pillow":
-        im2 = pil_drawing(im_arr, "line", list_pnts, color,
-                          width=width)
-    elif Backend == "skimage":
+    def run_pillow():
+        return pil_drawing(im_arr, "line", list_pnts, color,
+                           width=width)
+    def run_skimage():
         im2 = im_arr.copy()
 
         first = list_pnts[0]
@@ -82,18 +76,20 @@ def line(im_arr, list_pnts, color, width=1):
             tuple_color = getrgb(color)
             draw.set_color(im2, [rr, cc], tuple_color)
             first = second
+        return im2
 
-    elif Backend == "opencv":
-        cv2.line()
+    def run_opencv():
+        return cv2.line()
 
-    else:
-        print("敬请期待")
-
-    return im2
+    return run_backend(
+            func_skimage=run_skimage,
+            func_opencv=run_opencv,
+            # func_numpy=run_numpy,
+            func_pillow=run_pillow
+        )()
 
 def polygon(im_arr, list_pnts, color, width=1):
-    im2 = im_arr.copy()
-    if Backend == "pillow":
+    def run_pillow():
         if width > 1:  # and "fill" not in kwargs:
             # 将不支持填充
             logger.warning("PIL绘图模块不支持polygon线宽设置，使用封闭直线段的方式绘图")
@@ -107,12 +103,14 @@ def polygon(im_arr, list_pnts, color, width=1):
             if width > 1:
                 logger.warning("PIL绘图模块不支持polygon线宽设置")
             im2 = pil_drawing(im_arr, "polygon", list_pnts, color)  # 不支持width!
-    else:
-        print("敬请期待")
-    return im2
+        return im2
 
-# rect = polygon
-rect = rectangle
+    return run_backend(
+            # func_skimage=run_skimage,
+            # func_opencv=run_opencv,
+            # func_numpy=run_numpy,
+            func_pillow=run_pillow
+        )()
 
 def rectangle(im_arr, list_pnts, color, width=1):
     im2 = im_arr.copy()
@@ -128,6 +126,8 @@ def rectangle(im_arr, list_pnts, color, width=1):
             func_pillow=run_pillow
         )()
 
+# rect = polygon
+rect = rectangle
 
 #####################################################################
 
