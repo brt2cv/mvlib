@@ -342,6 +342,15 @@ def cnts_range(list_cnts, callback):
     max_ = max(list_values)
     return (min_, max_)
 
+def cnts_sort(list_cnts, callback):
+    """ return: [(cnt0, val0), (cnt1, val1), ...]
+        注意：排序是反序的，即从大到小排列。
+    """
+    list_values = _cnts_traverse(list_cnts, callback)
+    cnt2val = list(zip(list_cnts, list_values))
+    sort_cnt2val = sorted(cnt2val, key=lambda i: i[1], reverse=True)
+    return [cnt for cnt, val in sort_cnt2val]
+
 def filter_cnts(list_cnts, callback, range_pair):
     """ return a ContoursCollection of filters
         回调格式: callback(cnt) --> int
@@ -366,6 +375,8 @@ def filter_cnts(list_cnts, callback, range_pair):
         results.append(cnt)
 
     return results
+
+
 
 
 if __name__ == "__main__":
